@@ -4,6 +4,7 @@ import com.cola.partnermatching.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 用户服务
@@ -34,7 +35,7 @@ public interface UserService extends IService<User> {
     User doLogin(String userAccount, String userPassword, HttpServletRequest request);
 
     /**
-     *用户脱敏
+     * 用户脱敏
      *
      * @param originUser
      * @return
@@ -42,4 +43,12 @@ public interface UserService extends IService<User> {
     User getSafetyUser(User originUser);
 
     int userLogout(HttpServletRequest request);
+
+    /**
+     * 根据标签搜索用户
+     *
+     * @param tagNameList
+     * @return
+     */
+    List<User> searchUserByTags(List<String> tagNameList);
 }

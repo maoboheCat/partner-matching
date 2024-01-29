@@ -115,6 +115,7 @@ public class UserController {
 
     }
 
+
     private boolean isAdmin(HttpServletRequest request) {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User user = (User)userObj;

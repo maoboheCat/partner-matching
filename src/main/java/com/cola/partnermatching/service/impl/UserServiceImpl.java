@@ -7,15 +7,21 @@ import com.cola.partnermatching.exception.BusinessException;
 import com.cola.partnermatching.model.entity.User;
 import com.cola.partnermatching.service.UserService;
 import com.cola.partnermatching.mapper.UserMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.cola.partnermatching.contant.UserConstant.USER_LOGIN_STATE;
 
@@ -136,13 +142,55 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         safetyUser.setUserRole(originUser.getUserRole());
         safetyUser.setUserStatus(originUser.getUserStatus());
         safetyUser.setCreateTime(originUser.getCreateTime());
+        safetyUser.setTags(originUser.getTags());
         return safetyUser;
     }
 
+    /**
+     * 用户注销
+     * @param request
+     * @return
+     */
     @Override
     public int userLogout(HttpServletRequest request) {
         request.getSession().removeAttribute(USER_LOGIN_STATE);
         return 1;
+    }
+
+    /**
+     * 根据标签搜索用户
+     *
+     * @param tagNameList 用户拥有的标签
+     * @return
+     */
+    @Override
+    public List<User> searchUserByTags(List<String> tagNameList) {
+        if (CollectionUtils.isEmpty(tagNameList)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // sql 查询方法
+//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+//        // 拼接 and 查询
+//        for (String tagName : tagNameList) {
+//            queryWrapper = queryWrapper.like("tags" ,tagName);
+//        }
+//        List<User> userList = userMapper.selectList(queryWrapper);
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        List<User> userList = userMapper.selectList(queryWrapper);
+        Gson gson = new Gson();
+        return userList.stream().filter(user -> {
+            String tagsStr = user.getTags();
+            if (StringUtils.isBlank(tagsStr)) {
+                return false;
+            }
+            Set<String> tempTagNameSet = gson.fromJson(tagsStr, new TypeToken<Set<String>>(){}.getType());
+            for (String tagName : tagNameList) {
+                if (!tempTagNameSet.contains(tagName)) {
+                    return false;
+                }
+            }
+            return true;
+        }).map(this::getSafetyUser).collect(Collectors.toList());
     }
 }
 
