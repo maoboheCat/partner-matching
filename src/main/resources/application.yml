@@ -6,8 +6,17 @@ spring:
     url: jdbc:mysql://localhost:3306/partner_matching_db
     username: root
     password: 123456
+  # redis
+  redis:
+    port: 6379
+    host: localhost
+    database: 0
   session:
     timeout: 86400
+    store-type: redis
+#  config:
+#    activate:
+#      on-profile: dev
 server:
   port: 8080
   servlet:
@@ -23,6 +32,7 @@ mybatis-plus:
       logic-not-delete-value: 0
 knife4j:
   enable: true
+#  production: true
   openapi:
     title: "接口文档"
     version: 1.0
@@ -30,4 +40,4 @@ knife4j:
       default:
         api-rule: package
         api-rule-resources:
-          - com.cola.usercenter.controller
+          - com.cola.partnermatching.controller

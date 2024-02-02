@@ -84,6 +84,11 @@ public class User implements Serializable {
      */
     private Integer userRole;
 
+    /**
+     * 用户描述
+     */
+    private String profile;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

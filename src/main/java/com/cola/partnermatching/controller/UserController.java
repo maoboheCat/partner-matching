@@ -10,6 +10,7 @@ import com.cola.partnermatching.model.request.UserRegisterRequest;
 import com.cola.partnermatching.service.UserService;
 import com.cola.partnermatching.comment.ResultUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -28,6 +29,7 @@ import static com.cola.partnermatching.contant.UserConstant.USER_LOGIN_STATE;
  */
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(origins = {"http://localhost:5173"})
 public class UserController {
 
     @Resource
@@ -87,6 +89,15 @@ public class UserController {
         }
         List<User> results = userList.stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
         return ResultUtils.success(results);
+    }
+
+    @GetMapping("/search/tags")
+    public BaseRespsonse<List<User>> searchUserByTags(@RequestParam(required = false) List<String> tagNameList) {
+        if (CollectionUtils.isEmpty(tagNameList)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        List<User> userList = userService.searchUserByTags(tagNameList);
+        return ResultUtils.success(userList);
     }
 
     @PostMapping("/delete")
