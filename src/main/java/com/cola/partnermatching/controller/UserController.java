@@ -1,6 +1,7 @@
 package com.cola.partnermatching.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cola.partnermatching.comment.BaseRespsonse;
 import com.cola.partnermatching.comment.ErrorCode;
 import com.cola.partnermatching.exception.BusinessException;
@@ -97,6 +98,15 @@ public class UserController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         List<User> userList = userService.searchUserByTags(tagNameList);
+        return ResultUtils.success(userList);
+    }
+
+    @GetMapping("/recommend")
+    public BaseRespsonse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        Page<User> userList = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
+        List<User> results = userList.getRecords().stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
+        userList.setRecords(results);
         return ResultUtils.success(userList);
     }
 

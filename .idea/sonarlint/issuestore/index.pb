@@ -171,3 +171,7 @@ G.idea/sonarlint/issuestore/8/5/85ba8ee9471d78b8c840a52280d84d044b5d0e3f,4\7\47
 Q.idea/sonarlint/securityhotspotstore/8/e/8e9fa42502bfbda42f15c2586d83a988ee9a6c45,6\b\6b29dbd2864efc097f9d67250915d3651e8b71e6
 Å
 Q.idea/sonarlint/securityhotspotstore/8/5/85ba8ee9471d78b8c840a52280d84d044b5d0e3f,3\c\3ca1933f3aa41a5f555088a79c410a218f0926ae
+l
+<src/main/java/com/cola/partnermatching/once/InsertUsers.java,9\2\920f60a10adfe011e7571b8540dd921ee8588ebe
+t
+Dsrc/main/java/com/cola/partnermatching/config/MybatisPlusConfig.java,4\a\4ac8507887f935afe5a16ecab757dfebf49d361f

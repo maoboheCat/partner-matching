@@ -3,7 +3,6 @@ package com.cola.partnermatching.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cola.partnermatching.comment.ErrorCode;
-import com.cola.partnermatching.contant.UserConstant;
 import com.cola.partnermatching.exception.BusinessException;
 import com.cola.partnermatching.model.entity.User;
 import com.cola.partnermatching.service.UserService;
@@ -11,6 +10,7 @@ import com.cola.partnermatching.mapper.UserMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -208,6 +208,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public int updateUser(User user, User loginUser) {
         long userId = user.getId();
         if (userId <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (StringUtils.isAllBlank(user.getUsername(), user.getUserAccount(), user.getUserPassword(), user.getPhone(), user.getEmail(), user.getAvatarUrl(), user.getTags())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (!ArrayUtils.contains(new int[]{0, 1}, user.getGender())) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         if (!isAdmin(loginUser) && userId != loginUser.getId()) {
