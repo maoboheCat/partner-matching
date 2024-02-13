@@ -5,6 +5,7 @@ import com.cola.partnermatching.mapper.UserMapper;
 import com.cola.partnermatching.model.entity.User;
 import com.cola.partnermatching.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
@@ -40,18 +41,7 @@ public class InsertUsers {
             List<User> userList = new ArrayList<>();
             do {
                 j++;
-                User user = new User();
-                user.setUsername("假用户");
-                user.setUserAccount("test_maobohe");
-                user.setAvatarUrl("https://img2.baidu.com/it/u=2716851229,81878229&fm=253&fmt=auto&app=138&f=JPEG?w=300&h=300");
-                user.setGender(0);
-                user.setUserPassword("12345678");
-                user.setTags("[]");
-                user.setPhone("12345678");
-                user.setEmail("12345678@qq.com");
-                user.setUserStatus(0);
-                user.setUserRole(0);
-                user.setProfile("测试用户，不想写简介");
+                User user = getUser();
                 userList.add(user);
             } while (j % batchSize != 0);
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
@@ -63,5 +53,24 @@ public class InsertUsers {
         CompletableFuture.allOf(futureList.toArray(new CompletableFuture[]{})).join();
         stopWatch.stop();
         log.info(String.valueOf(stopWatch.getTotalTimeMillis()));
+    }
+
+    @NotNull
+    private static User getUser() {
+        User user = new User();
+        user.setUsername("假用户");
+        user.setUserAccount("test_maobohe");
+        user.setAvatarUrl("https://img2.baidu.com/it/u=2716851229,81878229&fm=253&fmt=auto&app=138&f=JPEG?w=300&h=300");
+        user.setGender(0);
+        user.setUserPassword("12345678");
+        user.setTags("[]");
+        user.setPhone("12345678");
+        user.setEmail("12345678@qq.com");
+        user.setUserStatus(0);
+        user.setUserRole(0);
+        user.setProfile("测试用户，不想写简介");
+        user.setUserPassword("12362358");
+        user.setUserRole(0);
+        return user;
     }
 }

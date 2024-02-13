@@ -4,12 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cola.partnermatching.comment.BaseRespsonse;
 import com.cola.partnermatching.comment.ErrorCode;
+import com.cola.partnermatching.comment.ResultUtils;
 import com.cola.partnermatching.exception.BusinessException;
 import com.cola.partnermatching.model.entity.User;
 import com.cola.partnermatching.model.request.UserLoginRequest;
 import com.cola.partnermatching.model.request.UserRegisterRequest;
 import com.cola.partnermatching.service.UserService;
-import com.cola.partnermatching.comment.ResultUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.cola.partnermatching.contant.UserConstant.ADMIN_ROLE;
 import static com.cola.partnermatching.contant.UserConstant.USER_LOGIN_STATE;
 
 /**
@@ -31,6 +31,7 @@ import static com.cola.partnermatching.contant.UserConstant.USER_LOGIN_STATE;
 @RestController
 @RequestMapping("/user")
 @CrossOrigin(origins = {"http://localhost:5173"}, allowCredentials = "true")
+@Slf4j
 public class UserController {
 
     @Resource
@@ -103,11 +104,9 @@ public class UserController {
 
     @GetMapping("/recommend")
     public BaseRespsonse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        Page<User> userList = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
-        List<User> results = userList.getRecords().stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
-        userList.setRecords(results);
-        return ResultUtils.success(userList);
+        User loginUser = userService.getLoginUser(request);
+        Page<User> userPage = userService.recommend(pageSize, pageNum, loginUser.getId());
+        return ResultUtils.success(userPage);
     }
 
     @PostMapping("/update")

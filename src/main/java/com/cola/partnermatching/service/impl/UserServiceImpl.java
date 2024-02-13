@@ -1,8 +1,10 @@
 package com.cola.partnermatching.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cola.partnermatching.comment.ErrorCode;
+import com.cola.partnermatching.comment.ResultUtils;
 import com.cola.partnermatching.exception.BusinessException;
 import com.cola.partnermatching.model.entity.User;
 import com.cola.partnermatching.service.UserService;
@@ -12,6 +14,8 @@ import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
@@ -20,6 +24,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -39,6 +44,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 盐值
@@ -267,6 +275,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public boolean isAdmin(User user) {
         return user != null && user.getUserRole() == ADMIN_ROLE;
+    }
+
+    /**
+     * 获取用户推荐信息
+     * @param pageSize
+     * @param pageNum
+     * @param loginUserId
+     * @return
+     */
+    @Override
+    public Page<User> recommend(long pageSize, long pageNum, long loginUserId) {
+        String redisKey = String.format("partnerMatching:user:recommend:%s", loginUserId);
+        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+        Page<User> userPage = (Page<User>) valueOperations.get(redisKey);
+        // 有缓存
+        if (userPage != null) {
+            return userPage;
+        }
+        // 无缓存
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        userPage = this.page(new Page<>(pageNum, pageSize), queryWrapper);
+        List<User> results = userPage.getRecords().stream().map(this::getSafetyUser).collect(Collectors.toList());
+        userPage.setRecords(results);
+        // 写缓存(捕获异常），即使写失败了也返回数据库查出来的数据
+        try {
+            valueOperations.set(redisKey, userPage, 1, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            log.error("redis set key error", e);
+        }
+        return userPage;
     }
 }
 

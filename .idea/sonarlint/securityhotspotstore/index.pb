@@ -175,3 +175,9 @@ l
 <src/main/java/com/cola/partnermatching/once/InsertUsers.java,9\2\920f60a10adfe011e7571b8540dd921ee8588ebe
 t
 Dsrc/main/java/com/cola/partnermatching/config/MybatisPlusConfig.java,4\a\4ac8507887f935afe5a16ecab757dfebf49d361f
+v
+Fsrc/main/java/com/cola/partnermatching/config/RedisTemplateConfig.java,d\a\da89405d7e105bbb5ec0e8428e0a2eb9dcf89473
+k
+;src/main/java/com/cola/partnermatching/job/PreCacheJOB.java,4\2\42fcb6cd7cf838293bf31cb55b93c8b93467e3ca
+k
+;src/main/java/com/cola/partnermatching/job/PreCacheJob.java,7\2\7222fd4bae7e52e43e844de6637db45380b459ac

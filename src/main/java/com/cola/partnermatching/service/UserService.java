@@ -1,5 +1,6 @@
 package com.cola.partnermatching.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cola.partnermatching.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -82,4 +83,13 @@ public interface UserService extends IService<User> {
      * @return
      */
     boolean isAdmin(User user);
+
+    /**
+     * 获取推荐用户信息
+     * @param pageSize
+     * @param pageNum
+     * @param loginUserId
+     * @return
+     */
+    Page<User> recommend(long pageSize, long pageNum, long loginUserId);
 }
