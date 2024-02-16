@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cola.partnermatching.comment.ErrorCode;
-import com.cola.partnermatching.comment.ResultUtils;
 import com.cola.partnermatching.exception.BusinessException;
 import com.cola.partnermatching.model.entity.User;
 import com.cola.partnermatching.service.UserService;
@@ -29,6 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.cola.partnermatching.contant.RedisConstant.REDIS_SYSTEM_NAME;
 import static com.cola.partnermatching.contant.UserConstant.ADMIN_ROLE;
 import static com.cola.partnermatching.contant.UserConstant.USER_LOGIN_STATE;
 
@@ -286,7 +286,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public Page<User> recommend(long pageSize, long pageNum, long loginUserId) {
-        String redisKey = String.format("partnerMatching:user:recommend:%s", loginUserId);
+        String redisKey = String.format("%s:user:recommend:%s", REDIS_SYSTEM_NAME, loginUserId);
         ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
         Page<User> userPage = (Page<User>) valueOperations.get(redisKey);
         // 有缓存

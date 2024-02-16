@@ -7,8 +7,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-import static com.cola.partnermatching.contant.UserConstant.ADMIN_ROLE;
-import static com.cola.partnermatching.contant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * 用户服务
