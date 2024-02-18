@@ -1,22 +1,22 @@
-package com.cola.partnermatching.model.entity;
+package com.cola.partnermatching.model.vo;
 
-import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
- * 用户
- * @TableName user
+ * 用户包装类（脱敏）
+ * @author Maobohe
+ * @createData 2024/2/17 18:56
  */
-@TableName(value ="user")
 @Data
-public class User implements Serializable {
+public class UserVO implements Serializable {
+
+    private static final long serialVersionUID = -7288908297921932841L;
     /**
      * 用户id
      */
-    @TableId(type = IdType.AUTO)
     private long id;
 
     /**
@@ -38,11 +38,6 @@ public class User implements Serializable {
      * 用户性别
      */
     private Integer gender;
-
-    /**
-     * 用户密码
-     */
-    private String userPassword;
 
     /**
      * 标签列表
@@ -74,11 +69,6 @@ public class User implements Serializable {
      */
     private Date updateTime;
 
-    /**
-     * 是否删除
-     */
-    @TableLogic
-    private Integer isDelete;
 
     /**
      * 用户权限
@@ -89,7 +79,4 @@ public class User implements Serializable {
      * 用户描述
      */
     private String profile;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 }

@@ -1,4 +1,4 @@
-package com.cola.partnermatching.comment;
+package com.cola.partnermatching.common;
 
 import lombok.Data;
 
@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 
 @Data
-public class BaseRespsonse<T> implements Serializable {
+public class BaseResponse<T> implements Serializable {
 
     private static final long serialVersionUID = 4752396857162581465L;
 
@@ -24,28 +24,28 @@ public class BaseRespsonse<T> implements Serializable {
 
     private String description;
 
-    public BaseRespsonse(int code, T data, String message, String description) {
+    public BaseResponse(int code, T data, String message, String description) {
         this.code = code;
         this.data = data;
         this.message = message;
         this.description = description;
     }
 
-    public BaseRespsonse(int code, T data, String message) {
+    public BaseResponse(int code, T data, String message) {
         this.code = code;
         this.data = data;
         this.message = message;
         this.description = "";
     }
 
-    public BaseRespsonse(int code, T data) {
+    public BaseResponse(int code, T data) {
         this.code = code;
         this.data = data;
         this.message = "";
         this.description = "";
     }
 
-    public BaseRespsonse(ErrorCode errorCode) {
+    public BaseResponse(ErrorCode errorCode) {
         this(errorCode.getCode(), null ,errorCode.getMessage(), errorCode.getDescription());
     }
 }

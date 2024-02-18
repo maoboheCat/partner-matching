@@ -1,6 +1,6 @@
 package com.cola.partnermatching.exception;
 
-import com.cola.partnermatching.comment.ErrorCode;
+import com.cola.partnermatching.common.ErrorCode;
 import lombok.Getter;
 
 /**

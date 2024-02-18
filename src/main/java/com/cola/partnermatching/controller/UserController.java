@@ -2,9 +2,9 @@ package com.cola.partnermatching.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cola.partnermatching.comment.BaseRespsonse;
-import com.cola.partnermatching.comment.ErrorCode;
-import com.cola.partnermatching.comment.ResultUtils;
+import com.cola.partnermatching.common.BaseResponse;
+import com.cola.partnermatching.common.ErrorCode;
+import com.cola.partnermatching.common.ResultUtils;
 import com.cola.partnermatching.exception.BusinessException;
 import com.cola.partnermatching.model.entity.User;
 import com.cola.partnermatching.model.request.UserLoginRequest;
@@ -38,7 +38,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public BaseRespsonse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
+    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         if (userRegisterRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求错误");
         }
@@ -53,7 +53,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public BaseRespsonse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+    public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         if (userLoginRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求错误");
         }
@@ -67,7 +67,7 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public BaseRespsonse<Integer> userLogout(HttpServletRequest request) {
+    public BaseResponse<Integer> userLogout(HttpServletRequest request) {
         if (request == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求错误");
         }
@@ -76,7 +76,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public BaseRespsonse<List<User>> searchUsers(String username, HttpServletRequest request) {
+    public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request) {
         // 仅管理员可查询
         if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH);
@@ -94,7 +94,7 @@ public class UserController {
     }
 
     @GetMapping("/search/tags")
-    public BaseRespsonse<List<User>> searchUserByTags(@RequestParam(required = false) List<String> tagNameList) {
+    public BaseResponse<List<User>> searchUserByTags(@RequestParam(required = false) List<String> tagNameList) {
         if (CollectionUtils.isEmpty(tagNameList)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -103,14 +103,14 @@ public class UserController {
     }
 
     @GetMapping("/recommend")
-    public BaseRespsonse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
+    public BaseResponse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
         Page<User> userPage = userService.recommend(pageSize, pageNum, loginUser.getId());
         return ResultUtils.success(userPage);
     }
 
     @PostMapping("/update")
-    public BaseRespsonse<Integer> updateUser(@RequestBody User user, HttpServletRequest request) {
+    public BaseResponse<Integer> updateUser(@RequestBody User user, HttpServletRequest request) {
         if (user == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -120,7 +120,7 @@ public class UserController {
     }
 
     @PostMapping("/delete")
-    public BaseRespsonse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
+    public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
         if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
@@ -132,7 +132,7 @@ public class UserController {
     }
 
     @GetMapping("/current")
-    public BaseRespsonse<User> getCurrentUser(HttpServletRequest request) {
+    public BaseResponse<User> getCurrentUser(HttpServletRequest request) {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User)userObj;
         if (currentUser == null) {

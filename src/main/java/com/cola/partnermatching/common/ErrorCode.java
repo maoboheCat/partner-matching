@@ -1,4 +1,4 @@
-package com.cola.partnermatching.comment;
+package com.cola.partnermatching.common;
 
 /**
  * @author Maobohe
