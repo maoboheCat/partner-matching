@@ -1,4 +1,4 @@
-package com.cola.partnermatching.model.request;
+package com.cola.partnermatching.model.request.team;
 
 import lombok.Data;
 
@@ -6,13 +6,19 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * 用户更新队伍请求体
  * @author Maobohe
- * @createData 2024/2/18 16:10
+ * @createData 2024/2/17 16:10
  */
 @Data
-public class TeamAddRequest implements Serializable {
+public class TeamUpdateRequest implements Serializable {
 
-    private static final long serialVersionUID = -4178039846031764511L;
+    private static final long serialVersionUID = -554413508804085301L;
+
+    /**
+     * 队伍id
+     */
+    private Long id;
 
     /**
      * 队伍名称
@@ -23,11 +29,6 @@ public class TeamAddRequest implements Serializable {
      * 描述
      */
     private String description;
-
-    /**
-     * 最大人数
-     */
-    private Integer maxNum;
 
     /**
      * 过期时间

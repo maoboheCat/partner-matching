@@ -1,4 +1,4 @@
-package com.cola.partnermatching.model.request;
+package com.cola.partnermatching.model.request.user;
 
 import lombok.Data;
 
@@ -11,13 +11,12 @@ import java.io.Serializable;
  * @createData 2024/1/24 14:07
  */
 @Data
-public class UserRegisterRequest implements Serializable {
+public class UserLoginRequest implements Serializable {
 
-    private static final long serialVersionUID = -5986039310639033933L;
+    private static final long serialVersionUID = -8018351812306623996L;
 
     private String userAccount;
 
     private String userPassword;
 
-    private String checkPassword;
 }

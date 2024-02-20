@@ -9,9 +9,7 @@ import com.cola.partnermatching.exception.BusinessException;
 import com.cola.partnermatching.model.dto.TeamQuery;
 import com.cola.partnermatching.model.entity.Team;
 import com.cola.partnermatching.model.entity.User;
-import com.cola.partnermatching.model.request.TeamAddRequest;
-import com.cola.partnermatching.model.request.TeamJoinRequest;
-import com.cola.partnermatching.model.request.TeamUpdateRequest;
+import com.cola.partnermatching.model.request.team.*;
 import com.cola.partnermatching.model.vo.TeamUserVO;
 import com.cola.partnermatching.service.TeamService;
 import com.cola.partnermatching.service.UserService;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -58,11 +55,12 @@ public class TeamController {
     }
 
     @PostMapping("/delete")
-    public BaseResponse<Boolean> deleteTeam(@RequestBody long id) {
-        if (id <= 0) {
+    public BaseResponse<Boolean> deleteTeam(@RequestBody TeamDeleteRequest teamDeleteRequest, HttpServletRequest request) {
+        if (teamDeleteRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        boolean result = teamService.removeById(id);
+        User loginUser = userService.getLoginUser(request);
+        boolean result = teamService.deleteTeam(teamDeleteRequest, loginUser);
         if (!result) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR);
         }
@@ -128,6 +126,16 @@ public class TeamController {
         }
         User loginUser = userService.getLoginUser(request);
         boolean result = teamService.joinTeam(teamJoinRequest, loginUser);
+        return ResultUtils.success(result);
+    }
+
+    @PostMapping("/quit")
+    public BaseResponse<Boolean> quitTeam(@RequestBody TeamQuitRequest teamQuitRequest, HttpServletRequest request) {
+        if (teamQuitRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        boolean result = teamService.quitTeam(teamQuitRequest, loginUser);
         return ResultUtils.success(result);
     }
 }

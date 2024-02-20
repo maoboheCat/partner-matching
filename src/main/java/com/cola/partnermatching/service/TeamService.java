@@ -4,11 +4,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cola.partnermatching.model.dto.TeamQuery;
 import com.cola.partnermatching.model.entity.Team;
 import com.cola.partnermatching.model.entity.User;
-import com.cola.partnermatching.model.request.TeamJoinRequest;
-import com.cola.partnermatching.model.request.TeamUpdateRequest;
+import com.cola.partnermatching.model.request.team.TeamDeleteRequest;
+import com.cola.partnermatching.model.request.team.TeamJoinRequest;
+import com.cola.partnermatching.model.request.team.TeamQuitRequest;
+import com.cola.partnermatching.model.request.team.TeamUpdateRequest;
 import com.cola.partnermatching.model.vo.TeamUserVO;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 
@@ -45,8 +46,24 @@ public interface TeamService extends IService<Team> {
     /**
      * 加入队伍
      * @param teamJoinRequest
-     * @param request
+     * @param loginUser
      * @return
      */
     boolean joinTeam(TeamJoinRequest teamJoinRequest, User loginUser);
+
+    /**
+     * 退出队伍
+     * @param teamQuitRequest
+     * @param loginUser
+     * @return
+     */
+    boolean quitTeam(TeamQuitRequest teamQuitRequest, User loginUser);
+
+    /**
+     * 解散队伍
+     * @param teamDeleteRequest
+     * @param loginUser
+     * @return
+     */
+    boolean deleteTeam(TeamDeleteRequest teamDeleteRequest, User loginUser);
 }
