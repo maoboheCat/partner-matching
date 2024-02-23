@@ -9,6 +9,7 @@ import com.cola.partnermatching.exception.BusinessException;
 import com.cola.partnermatching.model.entity.User;
 import com.cola.partnermatching.model.request.user.UserLoginRequest;
 import com.cola.partnermatching.model.request.user.UserRegisterRequest;
+import com.cola.partnermatching.model.vo.UserVO;
 import com.cola.partnermatching.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -143,5 +144,20 @@ public class UserController {
         User safetyUser = userService.getSafetyUser(user);
         return ResultUtils.success(safetyUser);
 
+    }
+
+    /**
+     * 匹配相同兴趣的用户
+     * @param num
+     * @param request
+     * @return
+     */
+    @GetMapping("/match")
+    public BaseResponse<List<User>> matchUsers(long num, HttpServletRequest request) {
+        if (num <= 0 || num > 20) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        return ResultUtils.success(userService.matchUser(num, loginUser));
     }
 }

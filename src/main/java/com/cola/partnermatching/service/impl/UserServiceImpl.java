@@ -3,6 +3,7 @@ package com.cola.partnermatching.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cola.partnermatching.common.AlgorithmUtils;
 import com.cola.partnermatching.common.ErrorCode;
 import com.cola.partnermatching.exception.BusinessException;
 import com.cola.partnermatching.model.entity.User;
@@ -13,6 +14,7 @@ import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.util.Pair;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -21,8 +23,7 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -214,14 +215,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public int updateUser(User user, User loginUser) {
-        long userId = user.getId();
+            long userId = user.getId();
         if (userId <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        if (StringUtils.isAllBlank(user.getUsername(), user.getUserAccount(), user.getUserPassword(), user.getPhone(), user.getEmail(), user.getAvatarUrl(), user.getTags())) {
+        Integer gender = user.getGender();
+        if (StringUtils.isAllBlank(user.getUsername(), user.getUserAccount(), user.getUserPassword(), user.getPhone(), user.getEmail(), user.getAvatarUrl(), user.getTags()) && gender == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        if (!ArrayUtils.contains(new int[]{0, 1}, user.getGender())) {
+        if (gender != null && !ArrayUtils.contains(new int[]{0, 1}, gender)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         if (!isAdmin(loginUser) && userId != loginUser.getId()) {
@@ -305,6 +307,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             log.error("redis set key error", e);
         }
         return userPage;
+    }
+
+
+    // TODO 优化空间，试着维护优先队列
+    @Override
+    public List<User> matchUser(long num, User loginUser) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id", "tags");
+        queryWrapper.isNotNull("tags");
+        List<User> userList = this.list(queryWrapper);
+        String tags = loginUser.getTags();
+        Gson gson = new Gson();
+        List<String> tagList = gson.fromJson(tags, new TypeToken<List<String>>() {
+        }.getType());
+        List<Pair<Long, Long>> indexDistancePairs = new ArrayList<>();
+        for (User user : userList) {
+            String userTags = user.getTags();
+            // 无标签 (用户）或者 为用户自己
+            if (StringUtils.equals("[]", userTags) || user.getId() == loginUser.getId()) {
+                continue;
+            }
+            List<String> userTagList = gson.fromJson(userTags, new TypeToken<List<String>>() {
+            }.getType());
+            // 计算分数
+            long distance = AlgorithmUtils.minDistance(tagList, userTagList);
+            indexDistancePairs.add(new Pair<>(user.getId(), distance));
+        }
+        List<Pair<Long, Long>> topMathUserIds = indexDistancePairs.stream().sorted(Comparator.comparing(Pair::getValue)).limit(num).collect(Collectors.toList());
+        List<Long> idList = topMathUserIds.stream().map(Pair::getKey).collect(Collectors.toList());
+        Map<Long, List<User>> userIdUserListMap = this.listByIds(idList).stream().map(this::getSafetyUser).collect(Collectors.groupingBy(User::getId));
+        List<User> finalUserList = new ArrayList<>();
+        for (Long userId : idList) {
+            finalUserList.add(userIdUserListMap.get(userId).get(0));
+        }
+        return finalUserList;
     }
 }
 

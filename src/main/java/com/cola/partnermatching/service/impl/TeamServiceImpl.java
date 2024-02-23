@@ -105,6 +105,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         return teamId;
     }
 
+    // TODO bug待修，目前状态：用户若无加入任何队伍，会搜出所有队伍（listMyJoinTeams接口，有问题）
     @Override
     public List<TeamUserVO> listTeams(TeamQuery teamQuery, boolean isAdmin) {
         QueryWrapper<Team> queryWrapper = new QueryWrapper<>();
@@ -112,6 +113,10 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             Long id = teamQuery.getId();
             if (id != null && id > 0 ) {
                 queryWrapper.eq("id", id);
+            }
+            List<Long> idList = teamQuery.getIdList();
+            if (CollectionUtils.isNotEmpty(idList)) {
+                queryWrapper.in("id", idList);
             }
             String searchText = teamQuery.getSearchText();
             if (StringUtils.isNotBlank(searchText)) {
@@ -129,14 +134,17 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             if (maxNum != null && maxNum > 0) {
                 queryWrapper.eq("maxNum", maxNum);
             }
-            Long userId = teamQuery.getUserId();
-            if (userId != null && userId > 0) {
-                queryWrapper.eq("userId", userId);
-            }
             Integer status = teamQuery.getStatus();
             TeamStatusEnum statusEnum = TeamStatusEnum.getEnumByValue(status);
             if (statusEnum == null) {
-                queryWrapper.and(qw -> qw.eq("status", TeamStatusEnum.PUBLIC.getValue()).or().eq("status", TeamStatusEnum.SECRET.getValue()));
+                Long userId = teamQuery.getUserId();
+                if (userId != null && userId > 0) {
+                    queryWrapper.eq("userId", userId);
+                }
+                else {
+                    queryWrapper.and(qw -> qw.eq("status", TeamStatusEnum.PUBLIC.getValue())
+                            .or().eq("status", TeamStatusEnum.SECRET.getValue()));
+                }
             } else {
                 queryWrapper.eq("status", statusEnum.getValue());
             }

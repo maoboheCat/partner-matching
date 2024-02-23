@@ -4,6 +4,7 @@ import com.cola.partnermatching.common.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
 
 
 /**
@@ -21,6 +22,11 @@ public class TeamQuery extends PageRequest {
      * 队伍id
      */
     private Long id;
+
+    /**
+     * id列表
+     */
+    private List<Long> idList;
 
     /**
      * 搜索关键词（同时对队伍名称和描述搜索）

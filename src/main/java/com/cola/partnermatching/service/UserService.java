@@ -3,6 +3,7 @@ package com.cola.partnermatching.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cola.partnermatching.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cola.partnermatching.model.vo.UserVO;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -90,4 +91,12 @@ public interface UserService extends IService<User> {
      * @return
      */
     Page<User> recommend(long pageSize, long pageNum, long loginUserId);
+
+    /**
+     * 匹配兴趣相同的用户
+     * @param num
+     * @param loginUser
+     * @return
+     */
+    List<User> matchUser(long num, User loginUser);
 }
