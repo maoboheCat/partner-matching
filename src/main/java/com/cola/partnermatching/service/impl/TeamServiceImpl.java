@@ -105,7 +105,6 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         return teamId;
     }
 
-    // TODO bug待修，目前状态：用户若无加入任何队伍，会搜出所有队伍（listMyJoinTeams接口，有问题）
     @Override
     public List<TeamUserVO> listTeams(TeamQuery teamQuery, boolean isAdmin) {
         QueryWrapper<Team> queryWrapper = new QueryWrapper<>();

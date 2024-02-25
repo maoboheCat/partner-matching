@@ -125,6 +125,12 @@ public class TeamController {
             });
         } catch (Exception e) {
         }
+        // 查询加入队伍的用户信息（人数）
+        QueryWrapper<UserTeam> userTeamJoinQueryWrapper = new QueryWrapper<>();
+        userTeamJoinQueryWrapper.in("teamId", teamIdList);
+        List<UserTeam> userTeamList = userTeamService.list(userTeamJoinQueryWrapper);
+        Map<Long, List<UserTeam>> teamIdUserTeamMap = userTeamList.stream().collect(Collectors.groupingBy(UserTeam::getTeamId));
+        teamVOList.forEach(teamVO -> teamVO.setHasJoinNum(teamIdUserTeamMap.getOrDefault(teamVO.getId(), new ArrayList<>()).size()));
         return ResultUtils.success(teamVOList);
     }
 
