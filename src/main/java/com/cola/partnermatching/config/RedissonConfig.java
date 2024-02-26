@@ -26,6 +26,7 @@ public class RedissonConfig {
     public RedissonClient redissonClient() {
         Config config = new Config();
         String redisAddress = String.format("redis://%s:%s", host, port);
+        // 设置 redisson key 存放在 1 数据库中
         config.useSingleServer().setAddress(redisAddress).setDatabase(1);
         RedissonClient redisson = Redisson.create(config);
         return redisson;

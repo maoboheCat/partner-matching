@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.cola.partnermatching.contant.RedisConstant.REDIS_SYSTEM_NAME;
+import static com.cola.partnermatching.contant.RedisConstant.*;
 
 /**
  * 缓存预热任务
@@ -40,10 +40,9 @@ public class PreCacheJob {
 
     private final List<Long> mianUserList = Arrays.asList(1L, 2L);
 
-    @Scheduled(cron = "0 35 14 * * *")
+    @Scheduled(cron = "0 31 19 * * *")
     public void doCacheRecommendUser() {
-        String redisKey = String.format("%s:precahcejob:docache:lock", REDIS_SYSTEM_NAME);
-        RLock lock = redissonClient.getLock(redisKey);
+        RLock lock = redissonClient.getLock(REDIS_JOB_DOCACHE);
         try {
             if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
                 for (Long userId : mianUserList) {
@@ -51,10 +50,10 @@ public class PreCacheJob {
                     Page<User> userPage = userService.page(new Page<>(1, 20), queryWrapper);
                     List<User> results = userPage.getRecords().stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
                     userPage.setRecords(results);
-                    redisKey = String.format("%s:user:recommend:%s", REDIS_SYSTEM_NAME, userId);
+                    String redisKey = String.format("%s:%s", REDIS_USER_RECOMMEND, userId);
                     ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
                     try {
-                        valueOperations.set(redisKey, userPage, 1, TimeUnit.MINUTES);
+                        valueOperations.set(redisKey, userPage, 120, TimeUnit.MINUTES);
                     } catch (Exception e) {
                         log.error("redis set key error", e);
                     }

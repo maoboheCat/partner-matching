@@ -207,3 +207,7 @@ q
 Asrc/main/java/com/cola/partnermatching/common/AlgorithmUtils.java,4\2\4272560a491d92a30964a0e7513936b362da7144
 u
 Esrc/test/java/com/cola/partnermatching/common/AlgorithmUtilsTest.java,7\6\76fd01274cd958fd6f5442790c3a8afe602fefc4
+q
+Asrc/main/java/com/cola/partnermatching/contant/RedisConstant.java,3\9\39ea74bf65081561e5649000ebec14629f2c6b9e
+q
+Asrc/main/java/com/cola/partnermatching/config/RedissonConfig.java,4\6\46afbed7e9606584f3dbf5fe9ab579dab876fc98
