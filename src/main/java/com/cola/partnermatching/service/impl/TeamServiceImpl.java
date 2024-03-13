@@ -255,7 +255,6 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         try {
             while (true) {
                 if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
-                    Thread.sleep(10000000);
                     QueryWrapper<UserTeam> userTeamQueryWrapper = new QueryWrapper<>();
                     userTeamQueryWrapper.eq("userId", userId);
                     long hasJoinCount = userTeamService.count(userTeamQueryWrapper);
