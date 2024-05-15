@@ -1,8 +1,11 @@
 
+K
+java:S1604Æ"(Make this anonymous inner class a lambda(…¥Ş»ùÿÿÿÿ8üÒÙá÷1
 G
-java:S5869G"*Remove duplicates in this character class.(Ô¼ó¨8¹–À©İ1
+java:S5869G"*Remove duplicates in this character class.(Ô¼ó¨8³ÕÙá÷1
 G
-java:S5869p"*Remove duplicates in this character class.(Ô¼ó¨8½–À©İ1
-^	java:S125º"<This block of commented-out lines of code should be removed.(äÏ’íøÿÿÿÿ8Â–À©İ1
-U
-java:S1135º"2Complete the task associated to this TODO comment.(›ˆ´¬ùÿÿÿÿ8Î–À©İ1
+java:S5869p"*Remove duplicates in this character class.(Ô¼ó¨8¾ÕÙá÷1
+^	java:S125º"<This block of commented-out lines of code should be removed.(äÏ’íøÿÿÿÿ8ÌÕÙá÷1
+Y	java:S125Ä"<This block of commented-out lines of code should be removed.(“±¯…8àœÚá÷1
+Y	java:S125á"<This block of commented-out lines of code should be removed.(íîĞ¾8‡ˆÚá÷1
+X	java:S125ã"<This block of commented-out lines of code should be removed.(Ù†¢68ëèÜá÷1

@@ -310,10 +310,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userPage;
     }
 
-
-    // TODO 优化空间，试着维护优先队列
     @Override
     public List<User> matchUser(long num, User loginUser) {
+        // 优化空间，试着维护优先队列
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id", "tags");
         queryWrapper.isNotNull("tags");
@@ -322,7 +321,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Gson gson = new Gson();
         List<String> tagList = gson.fromJson(tags, new TypeToken<List<String>>() {
         }.getType());
-        List<Pair<Long, Long>> indexDistancePairs = new ArrayList<>();
+//        List<Pair<Long, Long>> indexDistancePairs = new ArrayList<>();
+        // 维护优先队列
+        PriorityQueue<Pair<Long, Long>> indexDistancePriorityQueue = new PriorityQueue<>(new Comparator<Pair<Long, Long>>() {
+            @Override
+            public int compare(Pair<Long, Long> o1, Pair<Long, Long> o2) {
+                return (int) (o2.getValue() - o1.getValue());
+            }
+        });
+        // 初始化一个合适的值
+        indexDistancePriorityQueue.add(new Pair<>(0L, 5L));
+        // 开始维护
         for (User user : userList) {
             String userTags = user.getTags();
             // 无标签 (用户）或者 为用户自己
@@ -333,9 +342,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             }.getType());
             // 计算分数
             long distance = AlgorithmUtils.minDistance(tagList, userTagList);
-            indexDistancePairs.add(new Pair<>(user.getId(), distance));
+            if (distance < indexDistancePriorityQueue.peek().getValue()) {
+                // 维护规定大小的优先队列，大小为num，未满则不做删除操作
+                if (indexDistancePriorityQueue.size() >= num) {
+                    // 队列已经满，去除最大的，插入新值
+                    indexDistancePriorityQueue.poll();
+                }
+                indexDistancePriorityQueue.add(new Pair<>(user.getId(), distance));
+            }
+//            indexDistancePairs.add(new Pair<>(user.getId(), distance));
         }
-        List<Pair<Long, Long>> topMathUserIds = indexDistancePairs.stream().sorted(Comparator.comparing(Pair::getValue)).limit(num).collect(Collectors.toList());
+//        List<Pair<Long, Long>> topMathUserIds = indexDistancePairs.stream().sorted(Comparator.comparing(Pair::getValue)).limit(num).collect(Collectors.toList());
+        List<Pair<Long, Long>> topMathUserIds = indexDistancePriorityQueue.stream().sorted(Comparator.comparing(Pair::getValue)).collect(Collectors.toList());
         List<Long> idList = topMathUserIds.stream().map(Pair::getKey).collect(Collectors.toList());
         Map<Long, List<User>> userIdUserListMap = this.listByIds(idList).stream().map(this::getSafetyUser).collect(Collectors.groupingBy(User::getId));
         List<User> finalUserList = new ArrayList<>();
