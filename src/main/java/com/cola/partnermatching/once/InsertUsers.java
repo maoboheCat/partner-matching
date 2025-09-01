@@ -26,6 +26,8 @@ public class InsertUsers {
     @Resource
     private UserService userService;
 
+    private ExecutorService executorService = new ThreadPoolExecutor(40, 1000, 10000, TimeUnit.MINUTES, new ArrayBlockingQueue<>(10000));
+
     /**
      * 批量插入用户
      */
@@ -53,6 +55,34 @@ public class InsertUsers {
         CompletableFuture.allOf(futureList.toArray(new CompletableFuture[]{})).join();
         stopWatch.stop();
         log.info(String.valueOf(stopWatch.getTotalTimeMillis()));
+    }
+
+//    @Scheduled(initialDelay = 5000, fixedRate = Long.MAX_VALUE)
+    public void doConcurrencyInsertUsers() {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        // 分十组
+        final int INSERT_NUM = 100000;
+        int batchSize = 5000;
+        int j = 0;
+        List<CompletableFuture<Void>> futureList = new ArrayList<>();
+        for (int i = 0; i < INSERT_NUM/batchSize; i++) {
+            List<User> userList = new ArrayList<>();
+            do {
+                j++;
+                User user = getUser();
+                userList.add(user);
+            } while (j % batchSize != 0);
+            // 异步执行
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                System.out.println("threadName: " + Thread.currentThread().getName());
+                userService.saveBatch(userList, batchSize);
+            }, executorService);
+            futureList.add(future);
+        }
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[]{})).join();
+        stopWatch.stop();
+        System.out.println(stopWatch.getTotalTimeMillis());
     }
 
     @NotNull
