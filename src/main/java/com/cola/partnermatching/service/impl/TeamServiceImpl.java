@@ -1,6 +1,6 @@
 package com.cola.partnermatching.service.impl;
 
-import  com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cola.partnermatching.common.ErrorCode;
 import com.cola.partnermatching.exception.BusinessException;
@@ -38,10 +38,10 @@ import static com.cola.partnermatching.contant.RedisConstant.REDIS_USER_ADDTEAM;
 import static com.cola.partnermatching.contant.RedisConstant.REDIS_USER_JOINTEAM;
 
 /**
-* @author cola
-* @description 针对表【team(队伍)】的数据库操作Service实现
-* @createDate 2024-02-16 17:49:21
-*/
+ * @author cola
+ * @description 针对表【team(队伍)】的数据库操作Service实现
+ * @createDate 2024-02-16 17:49:21
+ */
 @Service
 public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements TeamService {
 
@@ -92,32 +92,31 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         String redisKey = String.format("%s:%s", REDIS_USER_ADDTEAM, userId);
         RLock lock = redissonClient.getLock(redisKey);
         try {
-            while (true) {
-                if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
-                    QueryWrapper<Team> queryWrapper = new QueryWrapper<>();
-                    queryWrapper.eq("userId", userId);
-                    long hasTeamNum = this.count(queryWrapper);
-                    if (hasTeamNum >= 5) {
-                        throw new BusinessException(ErrorCode.PARAMS_ERROR, "可创建队伍以达到上限");
-                    }
-                    team.setId(null);
-                    team.setUserId(userId);
-                    boolean result = this.save(team);
-                    Long teamId = team.getId();
-                    if (!result || teamId == null) {
-                        throw new BusinessException(ErrorCode.PARAMS_ERROR, "创建队伍失败");
-                    }
-                    UserTeam userTeam = new UserTeam();
-                    userTeam.setUserId(userId);
-                    userTeam.setTeamId(teamId);
-                    userTeam.setJoinTime(new Date());
-                    result = userTeamService.save(userTeam);
-                    if (!result) {
-                        throw new BusinessException(ErrorCode.PARAMS_ERROR, "创建队伍失败");
-                    }
-                    return teamId;
+            if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
+                QueryWrapper<Team> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("userId", userId);
+                long hasTeamNum = this.count(queryWrapper);
+                if (hasTeamNum >= 5) {
+                    throw new BusinessException(ErrorCode.PARAMS_ERROR, "可创建队伍以达到上限");
                 }
+                team.setId(null);
+                team.setUserId(userId);
+                boolean result = this.save(team);
+                Long teamId = team.getId();
+                if (!result || teamId == null) {
+                    throw new BusinessException(ErrorCode.PARAMS_ERROR, "创建队伍失败");
+                }
+                UserTeam userTeam = new UserTeam();
+                userTeam.setUserId(userId);
+                userTeam.setTeamId(teamId);
+                userTeam.setJoinTime(new Date());
+                result = userTeamService.save(userTeam);
+                if (!result) {
+                    throw new BusinessException(ErrorCode.PARAMS_ERROR, "创建队伍失败");
+                }
+                return teamId;
             }
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "系统繁忙，请稍后重试");
         } catch (InterruptedException e) {
             log.error("addTeam lock error", e);
             return 0;
@@ -126,7 +125,6 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
                 lock.unlock();
             }
         }
-
     }
 
     @Override
@@ -134,7 +132,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         QueryWrapper<Team> queryWrapper = new QueryWrapper<>();
         if (teamQuery != null) {
             Long id = teamQuery.getId();
-            if (id != null && id > 0 ) {
+            if (id != null && id > 0) {
                 queryWrapper.eq("id", id);
             }
             List<Long> idList = teamQuery.getIdList();
@@ -163,8 +161,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
                 Long userId = teamQuery.getUserId();
                 if (userId != null && userId > 0) {
                     queryWrapper.eq("userId", userId);
-                }
-                else {
+                } else {
                     queryWrapper.and(qw -> qw.eq("status", TeamStatusEnum.PUBLIC.getValue())
                             .or().eq("status", TeamStatusEnum.SECRET.getValue()));
                 }
@@ -373,6 +370,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
 
     /**
      * 根据 teamId 查询队伍已加入人数
+     *
      * @param teamId
      * @return
      */
@@ -384,6 +382,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
 
     /**
      * 根据id获取队伍信息
+     *
      * @param teamId
      * @return
      */

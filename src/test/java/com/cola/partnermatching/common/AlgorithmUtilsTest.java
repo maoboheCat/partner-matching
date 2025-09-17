@@ -2,6 +2,7 @@ package com.cola.partnermatching.common;
 
 import com.cola.partnermatching.model.entity.User;
 import com.cola.partnermatching.service.UserService;
+import com.cola.partnermatching.utils.AlgorithmUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.junit.Test;

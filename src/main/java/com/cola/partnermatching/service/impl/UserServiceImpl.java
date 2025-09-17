@@ -3,7 +3,7 @@ package com.cola.partnermatching.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cola.partnermatching.common.AlgorithmUtils;
+import com.cola.partnermatching.utils.AlgorithmUtils;
 import com.cola.partnermatching.common.ErrorCode;
 import com.cola.partnermatching.exception.BusinessException;
 import com.cola.partnermatching.model.entity.User;
@@ -29,7 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.cola.partnermatching.contant.RedisConstant.REDIS_SYSTEM_NAME;
 import static com.cola.partnermatching.contant.RedisConstant.REDIS_USER_RECOMMEND;
 import static com.cola.partnermatching.contant.UserConstant.ADMIN_ROLE;
 import static com.cola.partnermatching.contant.UserConstant.USER_LOGIN_STATE;
@@ -303,7 +302,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userPage.setRecords(results);
         // 写缓存(捕获异常），即使写失败了也返回数据库查出来的数据
         try {
-            valueOperations.set(redisKey, userPage, 1, TimeUnit.MINUTES);
+            valueOperations.set(redisKey, userPage, 120, TimeUnit.MINUTES);
         } catch (Exception e) {
             log.error("redis set key error", e);
         }
