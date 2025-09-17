@@ -1,4 +1,4 @@
-package com.cola.partnermatching.job;
+package com.cola.partnermatching.job.cycle;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -40,7 +40,7 @@ public class PreCacheJob {
 
     private final List<Long> mianUserList = Arrays.asList(1L, 2L);
 
-    @Scheduled(cron = "0 31 19 * * *")
+    @Scheduled(cron = "0 00 17 * * *")
     public void doCacheRecommendUser() {
         RLock lock = redissonClient.getLock(REDIS_JOB_DOCACHE);
         try {
@@ -53,7 +53,7 @@ public class PreCacheJob {
                     String redisKey = String.format("%s:%s", REDIS_USER_RECOMMEND, userId);
                     ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
                     try {
-                        valueOperations.set(redisKey, userPage, 120, TimeUnit.MINUTES);
+                        valueOperations.set(redisKey, userPage, 240, TimeUnit.MINUTES);
                     } catch (Exception e) {
                         log.error("redis set key error", e);
                     }

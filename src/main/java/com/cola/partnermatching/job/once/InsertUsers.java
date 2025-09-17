@@ -1,9 +1,8 @@
-package com.cola.partnermatching.once;
+package com.cola.partnermatching.job.once;
 
-import ch.qos.logback.core.util.FixedDelay;
-import com.cola.partnermatching.mapper.UserMapper;
 import com.cola.partnermatching.model.entity.User;
 import com.cola.partnermatching.service.UserService;
+import com.cola.partnermatching.utils.excel.ExcelUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,7 +12,7 @@ import org.springframework.util.StopWatch;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
 
 /**
  * @author Maobohe
@@ -57,6 +56,9 @@ public class InsertUsers {
         log.info(String.valueOf(stopWatch.getTotalTimeMillis()));
     }
 
+    /**
+     * 多线程插入
+     */
 //    @Scheduled(initialDelay = 5000, fixedRate = Long.MAX_VALUE)
     public void doConcurrencyInsertUsers() {
         StopWatch stopWatch = new StopWatch();
@@ -84,6 +86,14 @@ public class InsertUsers {
         stopWatch.stop();
         System.out.println(stopWatch.getTotalTimeMillis());
     }
+
+//    @Scheduled(cron = "0 0 0 1 8 2025")
+    public void doInsertUserByExcel() {
+        String file = "user.xlsx";
+        ExcelUtils.readUserByListener(file, userService);
+    }
+
+
 
     @NotNull
     private static User getUser() {

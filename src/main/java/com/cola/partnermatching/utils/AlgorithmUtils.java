@@ -1,4 +1,4 @@
-package com.cola.partnermatching.common;
+package com.cola.partnermatching.utils;
 
 import java.util.List;
 import java.util.Objects;
