@@ -2,9 +2,11 @@ package com.cola.partnermatching.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cola.partnermatching.annotation.AuthCheck;
 import com.cola.partnermatching.common.BaseResponse;
 import com.cola.partnermatching.common.ErrorCode;
 import com.cola.partnermatching.common.ResultUtils;
+import com.cola.partnermatching.contant.UserConstant;
 import com.cola.partnermatching.exception.BusinessException;
 import com.cola.partnermatching.model.entity.User;
 import com.cola.partnermatching.model.request.user.UserLoginRequest;
@@ -77,6 +79,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request) {
         // 仅管理员可查询
         if (!userService.isAdmin(request)) {
@@ -95,6 +98,7 @@ public class UserController {
     }
 
     @GetMapping("/search/tags")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
     public BaseResponse<List<User>> searchUserByTags(@RequestParam(required = false) List<String> tagNameList) {
         if (CollectionUtils.isEmpty(tagNameList)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -104,6 +108,7 @@ public class UserController {
     }
 
     @GetMapping("/recommend")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
     public BaseResponse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
         Page<User> userPage = userService.recommend(pageSize, pageNum, loginUser.getId());
@@ -111,6 +116,7 @@ public class UserController {
     }
 
     @PostMapping("/update")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
     public BaseResponse<Integer> updateUser(@RequestBody User user, HttpServletRequest request) {
         if (user == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -121,10 +127,8 @@ public class UserController {
     }
 
     @PostMapping("/delete")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
-        if (!userService.isAdmin(request)) {
-            throw new BusinessException(ErrorCode.NO_AUTH);
-        }
         if (id <= 0) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR);
         }
@@ -133,6 +137,7 @@ public class UserController {
     }
 
     @GetMapping("/current")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
     public BaseResponse<User> getCurrentUser(HttpServletRequest request) {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User)userObj;
@@ -153,6 +158,7 @@ public class UserController {
      * @return
      */
     @GetMapping("/match")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
     public BaseResponse<List<User>> matchUsers(long num, HttpServletRequest request) {
         if (num <= 0 || num > 20) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);

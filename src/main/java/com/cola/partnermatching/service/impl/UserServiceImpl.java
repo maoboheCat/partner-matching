@@ -245,14 +245,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public User getLoginUser(HttpServletRequest request) {
-        if (request == null) {
-            return null;
+        // 先判断是否已登录
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if (currentUser == null || currentUser.getId() == null) {
+            throw new BusinessException(ErrorCode.NO_LOGIN);
         }
-        Object user = request.getSession().getAttribute(USER_LOGIN_STATE);
-        if (user == null) {
-            throw new BusinessException(ErrorCode.NO_AUTH);
+        long userId = currentUser.getId();
+        currentUser = this.getById(userId);
+        if (currentUser == null) {
+            throw new BusinessException(ErrorCode.NO_LOGIN);
         }
-        return (User) user;
+        return currentUser;
     }
 
     /**
@@ -288,7 +292,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public Page<User> recommend(long pageSize, long pageNum, long loginUserId) {
-        String redisKey = String.format("%s:%s", REDIS_USER_RECOMMEND, loginUserId);
+        String redisKey = String.format("%s:%s:%s", REDIS_USER_RECOMMEND, loginUserId, pageNum);
         ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
         Page<User> userPage = (Page<User>) valueOperations.get(redisKey);
         // 有缓存
@@ -349,7 +353,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 }
                 indexDistancePriorityQueue.add(new Pair<>(user.getId(), distance));
             }
-//            indexDistancePairs.add(new Pair<>(user.getId(), distance));
         }
 //        List<Pair<Long, Long>> topMathUserIds = indexDistancePairs.stream().sorted(Comparator.comparing(Pair::getValue)).limit(num).collect(Collectors.toList());
         List<Pair<Long, Long>> topMathUserIds = indexDistancePriorityQueue.stream().sorted(Comparator.comparing(Pair::getValue)).collect(Collectors.toList());

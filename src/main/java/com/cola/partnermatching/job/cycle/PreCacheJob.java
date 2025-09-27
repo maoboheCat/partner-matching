@@ -47,10 +47,10 @@ public class PreCacheJob {
             if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
                 for (Long userId : mianUserList) {
                     QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-                    Page<User> userPage = userService.page(new Page<>(1, 20), queryWrapper);
+                    Page<User> userPage = userService.page(new Page<>(1, 10), queryWrapper);
                     List<User> results = userPage.getRecords().stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
                     userPage.setRecords(results);
-                    String redisKey = String.format("%s:%s", REDIS_USER_RECOMMEND, userId);
+                    String redisKey = String.format("%s:%s:%s", REDIS_USER_RECOMMEND, userId, 1);
                     ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
                     try {
                         valueOperations.set(redisKey, userPage, 240, TimeUnit.MINUTES);

@@ -2,9 +2,11 @@ package com.cola.partnermatching.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cola.partnermatching.annotation.AuthCheck;
 import com.cola.partnermatching.common.BaseResponse;
 import com.cola.partnermatching.common.ErrorCode;
 import com.cola.partnermatching.common.ResultUtils;
+import com.cola.partnermatching.contant.UserConstant;
 import com.cola.partnermatching.exception.BusinessException;
 import com.cola.partnermatching.model.dto.TeamQuery;
 import com.cola.partnermatching.model.entity.Team;
@@ -49,6 +51,7 @@ public class TeamController {
     private UserTeamService userTeamService;
 
     @PostMapping("/add")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
     public BaseResponse<Long> addTeam(@RequestBody TeamAddRequest teamAddRequest, HttpServletRequest request) {
         if (teamAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -65,6 +68,7 @@ public class TeamController {
     }
 
     @PostMapping("/delete")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
     public BaseResponse<Boolean> deleteTeam(@RequestBody TeamDeleteRequest teamDeleteRequest, HttpServletRequest request) {
         if (teamDeleteRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -78,6 +82,7 @@ public class TeamController {
     }
 
     @PostMapping("/update")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
     public BaseResponse<Boolean> updateTeam(@RequestBody TeamUpdateRequest teamUpdateRequest, HttpServletRequest request) {
         if (teamUpdateRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -91,6 +96,7 @@ public class TeamController {
     }
 
     @GetMapping("/get")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Team> getTeamById(long id) {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -103,6 +109,7 @@ public class TeamController {
     }
 
     @GetMapping("/list")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
     public BaseResponse<List<TeamUserVO>> listTeams(TeamQuery teamQuery, HttpServletRequest request) {
         if (teamQuery == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -135,6 +142,7 @@ public class TeamController {
     }
 
     @GetMapping("/list/page")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<Team>> listTeamsByPage(TeamQuery teamQuery) {
         if (teamQuery == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -152,6 +160,7 @@ public class TeamController {
     }
 
     @PostMapping("/join")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
     public BaseResponse<Boolean> joinTeam(@RequestBody TeamJoinRequest teamJoinRequest, HttpServletRequest request) {
         if (teamJoinRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -162,6 +171,7 @@ public class TeamController {
     }
 
     @PostMapping("/quit")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
     public BaseResponse<Boolean> quitTeam(@RequestBody TeamQuitRequest teamQuitRequest, HttpServletRequest request) {
         if (teamQuitRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -178,6 +188,7 @@ public class TeamController {
      * @return
      */
     @GetMapping("/list/my/create")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
     public BaseResponse<List<TeamUserVO>> listMyCreateTeams(TeamQuery teamQuery, HttpServletRequest request) {
         if (teamQuery == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -195,6 +206,7 @@ public class TeamController {
      * @return
      */
     @GetMapping("/list/my/join")
+    @AuthCheck(mustRole = UserConstant.DEFAULT_ROLE)
     public BaseResponse<List<TeamUserVO>> listMyJoinTeams(TeamQuery teamQuery, HttpServletRequest request) {
         if (teamQuery == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);

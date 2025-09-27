@@ -17,5 +17,8 @@ public interface UserConstant {
      * 用户权限
      */
     int DEFAULT_ROLE = 0;
+
     int ADMIN_ROLE = 1;
+
+    int BAN_ROLE = 2;
 }

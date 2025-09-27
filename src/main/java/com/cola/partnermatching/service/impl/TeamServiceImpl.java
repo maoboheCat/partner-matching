@@ -89,7 +89,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (new Date().after(expireTime)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "时间设置错误");
         }
-        String redisKey = String.format("%s:%s", REDIS_USER_ADDTEAM, userId);
+        String redisKey = String.format("%s:%s:%s", REDIS_USER_ADDTEAM, userId, team.getName().hashCode());
         RLock lock = redissonClient.getLock(redisKey);
         try {
             if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
@@ -116,7 +116,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
                 }
                 return teamId;
             }
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "系统繁忙，请稍后重试");
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "操作繁忙，请稍后重试");
         } catch (InterruptedException e) {
             log.error("addTeam lock error", e);
             return 0;
@@ -208,6 +208,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         }
         Long id = teamUpdateRequest.getId();
         Team oldTeam = this.getTeamById(id);
+
 
         if (oldTeam.getId() != loginUser.getId() && !userService.isAdmin(loginUser)) {
             throw new BusinessException(ErrorCode.NO_AUTH);
